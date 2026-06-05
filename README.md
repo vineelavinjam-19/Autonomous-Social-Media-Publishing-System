@@ -112,7 +112,7 @@ linkedin-content-automation/
 ### 1. Clone Repository
 
 ```bash
-git clone https://github.com/yourusername/linkedin-content-automation.git
+git clone https://github.com/vineelavinjam-19/Autonomous-Social-Media-Publishing-System.git
 cd linkedin-content-automation
 ```
 
