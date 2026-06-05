@@ -99,7 +99,8 @@ linkedin-content-automation/
 ├── screenshots/
 │   ├── workflow.png
 │   ├── sheets.png
-│   └── linkedin-post.png
+│   ├── linkedin-post.png 
+│   └──  linkedin-posts-of-workflow&automated-post.png
 │
 └── README.md
 ```
