@@ -1,0 +1,368 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "weeks",
+              "triggerAtDay": [
+                0,
+                4
+              ],
+              "triggerAtHour": 19
+            },
+            {}
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -320,
+        -32
+      ],
+      "id": "2ae8bbf0-dd1d-461f-b2ef-b3dd3d08bd93",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "You are a professional LinkedIn content creator for Vineela Vinjam.\n\nYou create engaging LinkedIn posts with:\n- strong opening hook\n- short readable paragraphs\n- professional tone\n- emojis\n- relevant hashtags\n\nImportant context:\n- This is Vineela's FIRST LinkedIn post created using AI automation\n- She built an AI-powered automation workflow using n8n, Google Gemini, and LinkedIn API\n- The post should feel personal, milestone-worthy, and exciting\n- Mention it's her first automated post if it's the first one\n- Keep posts concise and impactful",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -32,
+        -32
+      ],
+      "id": "c0ea3245-55e8-4457-88af-3a7df06e17d1",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -272,
+        -208
+      ],
+      "id": "355c16c6-3a83-42b9-a2f1-e917accba85e",
+      "name": "When chat message received",
+      "webhookId": "375fd975-b45c-411e-b9e0-6b8384a8b915"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        -176,
+        224
+      ],
+      "id": "d429ec09-aa56-43c8-975b-102a47245908",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "FOizWgNYPMpfwS2U",
+          "name": "Google Gemini(PaLM) Api account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "vinnivinjam@gmail.com",
+        "subject": "= {{ $json.output }}",
+        "message": "This is a scheduled msg from AI agent",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        784,
+        736
+      ],
+      "id": "a4453731-a2c4-4b91-bfb7-a50a17d9ebcc",
+      "name": "Send a message",
+      "webhookId": "1a9998cd-d064-448a-ae05-ceaafb564f8a",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "sKZP1HdY4iF2b2C0",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $fromAI('To', ``, 'string') }}",
+        "subject": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Subject', ``, 'string') }}",
+        "message": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message', ``, 'string') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.2,
+      "position": [
+        320,
+        160
+      ],
+      "id": "026fc412-42d5-4fd5-8bfc-ba3b41ea386e",
+      "name": "Send a message in Gmail",
+      "webhookId": "dced9d72-5210-4f18-894b-db94c13396a0",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "sKZP1HdY4iF2b2C0",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.linkedin.com/v2/ugcPosts",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "X-Restli-Protocol-Version",
+              "value": "2.0.0"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"author\": \"urn:li:person:bnONT-WdmW\",\n  \"lifecycleState\": \"PUBLISHED\",\n  \"specificContent\": {\n    \"com.linkedin.ugc.ShareContent\": {\n      \"shareCommentary\": {\n        \"text\": \"{{ $json.postText }}\"\n      },\n      \"shareMediaCategory\": \"NONE\"\n    }\n  },\n  \"visibility\": {\n    \"com.linkedin.ugc.MemberNetworkVisibility\": \"PUBLIC\"\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        592,
+        -64
+      ],
+      "id": "c58aa635-a235-4d18-8d9c-bdd59809c948",
+      "name": "HTTP Request",
+      "credentials": {
+        "linkedInOAuth2Api": {
+          "id": "hSHbaJM5hst9mSm0",
+          "name": "LinkedIn OAuth2 API"
+        },
+        "httpHeaderAuth": {
+          "id": "DaNwQwnn2EYeHsPc",
+          "name": "Header Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "cf448a08-7668-4d3f-aff4-d9f7cfc3f40e",
+              "name": "postText",
+              "value": "={{ $('AI Agent').item.json.output.replace(/\\n/g, ' ').replace(/\"/g, \"'\") }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        336,
+        -64
+      ],
+      "id": "770cbd77-f09d-4157-b96f-326821e48569",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1Rb9bfAg47BvhFLxWMY0eHgQ92aZSjMcaWOW4SvVWJ5U",
+          "mode": "list",
+          "cachedResultName": "linkedin posts ",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Rb9bfAg47BvhFLxWMY0eHgQ92aZSjMcaWOW4SvVWJ5U/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Rb9bfAg47BvhFLxWMY0eHgQ92aZSjMcaWOW4SvVWJ5U/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        160,
+        192
+      ],
+      "id": "7380a7eb-3ecb-4fd1-ab59-23109593bdb4",
+      "name": "Get row(s) in sheet in Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "js3lYlCwmjtKiCzU",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "vineela_linkedin_session",
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.4,
+      "position": [
+        896,
+        336
+      ],
+      "id": "a3c28b8f-159d-45b3-9868-bfb6998a2169",
+      "name": "Postgres Chat Memory",
+      "credentials": {
+        "postgres": {
+          "id": "QQTJzf5VUxysRdsc",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "vineela_session",
+        "contextWindowLength": 20
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.4,
+      "position": [
+        0,
+        224
+      ],
+      "id": "95554e82-3ea2-4500-a2b4-5a56a61ecbde",
+      "name": "Simple Memory"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message in Gmail": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet in Google Sheets": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres Chat Memory": {
+      "ai_memory": [
+        []
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "e84be94c-fc61-43b2-96f0-bdb01bf80be7",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "80532070389ddac47d751463a3c225d2e850f56696a044e4f06bd790be9b8ab8"
+  },
+  "id": "BhGWskTRbmrPnyOw",
+  "tags": []
+}
